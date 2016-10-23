@@ -120,8 +120,10 @@ Z.prop.test<-function(p1,n1,p0,p2=0,n2=0,alternative="two.sided", conf.level=0.9
 Task 2.1: Regression, fit the data and plot it (+ equation)
 
 ```{r}
+install.packages("cowplot")
 library(curl)
 library(ggplot2)
+library(cowplot)
 d <- read.csv(curl("https://raw.githubusercontent.com/difiore/ADA2016/master/KamilarAndCooperData.csv"), header = TRUE, sep = ",", stringsAsFactors = FALSE)
 head(d) # Uploaded dataset
 
