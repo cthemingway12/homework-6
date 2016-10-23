@@ -1,0 +1,239 @@
+---
+title: "homework-6"
+author: "Claire Hemingway"
+date: "October 23, 2016"
+output: html_document
+---
+Task 1: This is the function for the Z-proportion test!
+
+```{r}
+Z.prop.test<-function(p1,n1,p0,p2=0,n2=0,alternative="two.sided", conf.level=0.95){
+  if(p2==0&&n2==0){  
+    if(alternative=="greater"){
+      ph<-mean(p1)
+      z<-(ph-p0)/sqrt(p0*(1-p0)/n1)
+      p<-pnorm(z,lower.tail=FALSE)
+      lowerCI<-ph-qnorm(conf.level)*sqrt(ph*(1-ph)/n1)
+      upperCI<-ph-qnorm(0)*sqrt(ph*(1-ph)/n1)
+      if((n1*p1)>5&&(n1*(1-p1))>5){
+        distrib="check for data distribution"}
+      else{
+        distrib="data normally distributed (rule of thumb)"
+      }
+      output<-list(z.value = z, p.value=p,lowCi=lowerCI,upperCI=upperCI,distribution=distrib)
+      return(output)
+    }
+    else if(alternative=="less"){
+      ph<-mean(p1)
+      z<-(ph-p0)/sqrt(p0*(1-p0)/n1)
+      p<-pnorm(z,lower.tail=TRUE)
+      lowerCI<-ph+qnorm(0)*sqrt(ph*(1-ph)/n1)
+      upperCI<-ph+qnorm(conf.level)*sqrt(ph*(1-ph)/n1) 
+      if((n1*p1)>5&&(n1*(1-p1))>5){
+        distrib="check for data distribution"}
+      else{
+        distrib="data normally distributed (rule of thumb)"
+      }
+      output<-list(z.value = z, p.value=p,lowerCi=lowerCI,upperCI=upperCI,distribution=distrib)
+      return(output)
+    }
+    else if(alternative=="two.sided"){
+      ph<-mean(p1)
+      z<-(ph-p0)/sqrt(p0*(1-p0)/n1)
+      p<-2*pnorm(-abs(z))
+      lowerCI<-ph-qnorm((1-conf.level)/2)*sqrt(ph*(1-ph)/n1)
+      upperCI<-ph+qnorm((1-conf.level)/2)*sqrt(ph*(1-ph)/n1)
+      if((n1*p1)>5&&(n1*(1-p1))>5){
+        distri="check for data distribution"}
+      else{
+        distrib="data normally distributed (rule of thumb)"
+      }
+      output<-list(z.value = z, p.value=p,lowerCi=lowerCI,upperCI=upperCI,distribution=distrib)
+      return(output)
+    }
+  }
+  else{
+    if(alternative=="two.sided"){
+      pst <- (sum(p1) + sum(p2))/(length(p1) + length(p2))
+      ph1 <- mean(p1)
+      ph2 <- mean(p2)
+      dif<-ph1-ph2
+      se1<-sqrt(ph1*(1-ph1)/n1)
+      se2<-sqrt(ph2*(1-ph2)/n2)
+      sdif<-sqrt(se1^2+se2^2)
+      z <- (ph2 - ph1)/sqrt((pst * (1 - pst)) * (1/n1 + 1/n2))
+      p <- (1 - pnorm(z, lower.tail = FALSE)) + pnorm(z, lower.tail = TRUE) 
+      upperCI<-dif+qnorm(conf.level)*sdif
+      lowerCI<-dif-qnorm(conf.level)*sdif
+      if((n1*p1)>5&&(n1*(1-p1)&&(n2*p2)>5&&(n2*(1-p2))>5)){
+        distrib="check data distribution?"}
+      else{
+        distrib="data normally distributed (rule of thumb)"
+      }        
+      output<-list(z.value = z, p.value=p,lowerCi=lowerCI,upperCI=upperCI,distribution=distrib)
+      return(output)
+    }
+    else if (alternative=="less"){
+      pst <- (sum(p1) + sum(p2))/(n1 + n2)
+      ph1 <- mean(p1)
+      ph2 <- mean(p2)
+      dif<-ph1-ph2
+      se1<-sqrt(ph1*(1-ph1)/n1)
+      se2<-sqrt(ph2*(1-ph2)/n2)
+      sdif<-sqrt(se1^2+se2^2)
+      z <- (ph2 - ph1)/sqrt((pst * (1 - pst)) * (1/n1 + 1/n2))
+      p <- 1 - pnorm(z, lower.tail = TRUE)
+      lowerCI<-dif+qnorm(0)*sdif
+      upperCI<-dif+qnorm(conf.level)*sdif
+      if((n1*p1)>5&&(n1*(1-p1)&&(n2*p2)>5&&(n2*(1-p2))>5)){
+        distrib="check data distribution?"}
+      else{
+        distrib="data normally distributed (rule of thumb)"
+      }        
+      output<-list(z.value = z, p.value=p,lowerCi=lowerCI,upperCI=upperCI,distribution=distrib)
+      return(output)
+    } 
+    else if (alternative=="greater"){
+      pst <- (sum(p1) + sum(p2))/(n1 + n2)
+      ph1 <- mean(p1)
+      ph2 <- mean(p2)
+      dif<-ph1-ph2
+      se1<-sqrt(ph1*(1-ph1)/n1)
+      se2<-sqrt(ph2*(1-ph2)/n2)
+      sdif<-sqrt(se1^2+se2^2)
+      z <- (ph2 - ph1)/sqrt((pst * (1 - pst)) * (1/n1 + 1/n2))
+      p <- 1 - pnorm(z, lower.tail = FALSE)
+      lowerCI<-dif+qnorm(0)*sdif
+      upperCI<-dif+qnorm(conf.level)*sdif
+      if((n1*p1)>5&&(n1*(1-p1)&&(n2*p2)>5&&(n2*(1-p2))>5)){
+        distrib="check data distribution?"}
+      else{
+        distrib="data normally distributed (rule of thumb)"
+      }        
+      output<-list(z.value = z, p.value=p,lowerCi=lowerCI,upperCI=upperCI,distribution=distrib)
+      return(output)
+    } 
+  }     
+}
+```
+
+Task 2.1: Regression, fit the data and plot it (+ equation)
+
+```{r}
+library(curl)
+library(ggplot2)
+d <- read.csv(curl("https://raw.githubusercontent.com/difiore/ADA2016/master/KamilarAndCooperData.csv"), header = TRUE, sep = ",", stringsAsFactors = FALSE)
+head(d) # Uploaded dataset
+
+# Run the models for untransformed and log transformed and create labels for the regression lines.
+
+model.untr<-lm(MaxLongevity_m~Brain_Size_Species_Mean, d)
+summary(model.untr)
+b0_ut<-signif(coef(model.untr)[1])
+b1_ut<-signif(coef(model.untr)[2])
+label.ut<-paste("y= ",b1_ut,"x+ ",b0_ut,sep="")
+
+d$log.brainsize<-log(d$Brain_Size_Species_Mean)  # Create new columns of the log transformed values (brainsize)
+d$log.longevity<-log(d$MaxLongevity_m)           # Create new columns of the log transformed values (longevity)
+head(d)
+
+model.tr<-lm(log.longevity~log.brainsize, d)
+summary(model.tr)
+b0_tr<-signif(coef(model.tr)[1])
+b1_tr<-signif(coef(model.tr)[2])
+label.tr<-paste("y= ",b1_tr,"x+ ",b0_tr,sep="")
+
+# Plot the data + best fit regression + equation
+# untransformed
+put<- ggplot(data = d, aes(x = Brain_Size_Species_Mean, y = MaxLongevity_m))
+put<-put+geom_point()
+put<-put+geom_smooth(method = "lm", formula = y ~ x)
+put<-put+geom_text(aes(x=260, y=390, label=label.ut),size=4,parse=FALSE)
+put
+
+# log transformed
+ptr<-ggplot(data = d, aes(x = log.brainsize , y = log.longevity))
+ptr<-ptr+geom_point()
+ptr<-ptr+geom_smooth(method = "lm", formula = y ~ x)
+ptr<-ptr+geom_text(aes(x=1.3, y=6.0, label=label.tr),size=4,parse=FALSE)
+ptr
+```
+
+Task 2.2: Identify and interpret the point beta 1 (slope) for each model. Also, find a 90 percent CI for the slope ($\beta_1$) parameter.
+```{r}
+# Slope, statistics and CI's for the untransformed dataset
+b1_ut
+summary(model.untr)
+cIut<-confint(model.untr,level=0.95)
+cIut
+
+# Slope, statistics and CI's for the log transformed dataset
+b1_tr
+summary(model.tr)
+CItr<-confint(model.tr, level=0.95)
+CItr
+```
+Interpretation: B1 is EXPECTED change in units of y for every 1 unit of change in x (longevity for every 1 unit of change in brain size).Both models (log transformed and untransformed) result in highly significant p-values against H0 that Beta1=0, and for the HA that Beta1 doesn't equal zero.
+
+Task 2.3 Add lines for the 90 percent confidence and prediction interval bands on the plot, and add a legend to differentiate between CI and PI.
+```{r}
+# untransformed
+# calculate CI's and PI's for the untransformed brainsize + longevity
+cut<-predict(model.untr,newdata=data.frame(Brain_Size_Species_Mean=d$Brain_Size_Species_Mean),interval="confidence", level=0.95)
+head(cut)
+put<-predict(model.untr, newdata = data.frame(Brain_Size_Species_Mean=d$Brain_Size_Species_Mean), interval = "prediction",level = 0.95)
+head(put)
+
+# connect everything in a data.frame
+data<-cbind(d$Brain_Size_Species_Mean,d$MaxLongevity_m,cut,put)
+data<-data.frame(data)
+head(data)
+colnames(data)<-c("Brainsize", "Longevity", "fit.CI", "lower.CI", "upper.CI","fit.PI", "lower.PI", "upper.PI")
+
+
+plot.ut<- ggplot(data = data, aes(x = Brainsize, y = Longevity))
+plot.ut<-plot.ut+geom_line(aes(x = Brainsize, y = fit.CI))
+plot.ut<-plot.ut+geom_point()
+plot.ut<-plot.ut+geom_line(aes(x = Brainsize, y = lower.CI,color="Confidence Interval"))
+plot.ut<-plot.ut+geom_line(aes(x = Brainsize, y = upper.CI,color="Confidence Interval"))
+plot.ut<-plot.ut+geom_line(aes(x=Brainsize, y=lower.PI,colour="Prediction Interval"))
+plot.ut<-plot.ut+geom_line(aes(x=Brainsize, y=upper.PI,colour="Prediction Interval"))
+plot.ut
+
+# log transformed
+# calculate CI's and PI's for log transformed brainsize + longevity
+ctr<-predict(model.tr,newdata=data.frame(log.brainsize=d$log.brainsize),interval="confidence", level=0.95)
+head(ctr)
+ptr<-predict(model.tr, newdata = data.frame(log.brainsize=d$log.brainsize), interval = "prediction",level = 0.95)
+head(ptr)
+
+# connect everything in a data.frame
+data.tr<-cbind(d$log.brainsize,d$log.longevity,ctr,ptr)
+data.tr<-data.frame(data.tr)
+head(data.tr)
+colnames(data.tr)<-c("Brainsize", "Longevity", "fit.CI", "lower.CI", "upper.CI","fit.PI", "lower.PI", "upper.PI")
+
+
+plot.tr<- ggplot(data = data.tr, aes(x = Brainsize, y = Longevity))
+plot.tr<-plot.tr+geom_line(aes(x = Brainsize, y = fit.CI))
+plot.tr<-plot.tr+geom_point()
+plot.tr<-plot.tr+geom_line(aes(x = Brainsize, y = lower.CI,color="Confidence Interval"))
+plot.tr<-plot.tr+geom_line(aes(x = Brainsize, y = upper.CI,color="Confidence Interval"))
+plot.tr<-plot.tr+geom_line(aes(x=Brainsize, y=lower.PI,colour="Prediction Interval"))
+plot.tr<-plot.tr+geom_line(aes(x=Brainsize, y=upper.PI,colour="Prediction Interval"))
+plot.tr
+```
+
+Task 2.4: Produce a point estimate and associated 90 percent PI for the longevity of a species whose brain weight is 800 gm.Do you trust the model to predict observations accurately for this value of the explanatory variable? Why or why not?
+```{r}
+# untransformed
+Untr<-predict(model.untr, newdata = data.frame(Brain_Size_Species_Mean = 800), interval = "prediction",level = 0.90)
+Untr
+
+# log transformed
+Tr<-predict(model.tr, newdata = data.frame(log.brainsize = log(800)), interval = "prediction",level = 0.90)
+Tr
+```
+Interpretation: 90 % chance that the longevity of a species with brain mass 800 is between ~1021 and ~1424.Range for logtransformed dataset (~6.02 and ~6.86).
+Datapoints evenly distributed when log transformed. Linear relatinship of log transformed dataset seems to be clearer. Datapoints in untransformed dataset mostly located in "lower" area (small brain mass, short longevity).
+
